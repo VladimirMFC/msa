@@ -65,6 +65,8 @@ int main(int argc, char **argv)
 	// Start work
 	url_open(&url);
 
+	url_receive(&url);
+
 	//closelog();
 
 	return EXIT_SUCCESS;

@@ -13,10 +13,12 @@
 struct url_t
 {
 	int s;
+	unsigned int port;
+	unsigned long addr;
 	struct sockaddr_in a;
 };
 
-bool url_parse(const char *addr, struct url_t *url);
+bool url_parse(const char *addr, const int argn, struct url_t *url);
 bool url_open(struct url_t *url);
 bool url_receive(struct url_t *url);
 bool url_close(struct url_t *url);

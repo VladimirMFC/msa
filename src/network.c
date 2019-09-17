@@ -2,15 +2,24 @@
 
 #define BUFLEN 2048
 
-bool url_parse(const char *addr, struct url_t *url)
+bool url_parse(const char *arg, const int argn, struct url_t *url)
 {
-	//url = malloc(sizeof(struct url_t));
-	//url->network = PF_INET;
-	//url->protocol = SOCK_DGRAM;
-	//url->address = atoi("224.1.0.1");
-	//url->port = 11111;
+	bool res = false;
+	switch(argn)
+	{
+	case 1:	// IP ADDRESS
+		url->addr = inet_addr(arg);
+		res = true;
+		break;
+	case 2: // PORT
+		url->port = htons(atoi(arg));
+		res = true;
+		break;
+//	default:
+//		res = false;
+	}
 
-	return true;
+	return res;
 }
 
 bool url_open(struct url_t *url)
@@ -23,7 +32,8 @@ bool url_open(struct url_t *url)
 
 	memset(&url->a, 0, sizeof(url->a));
 	url->a.sin_family = AF_INET;
-	url->a.sin_port = htons(11111);
+	//url->a.sin_port = htons(11111);
+	url->a.sin_port = url->port;
 	url->a.sin_addr.s_addr = htonl(INADDR_ANY);
 
 	if ((bind(url->s, &url->a, sizeof(url->a))) < 0)
@@ -33,7 +43,8 @@ bool url_open(struct url_t *url)
 	}
 
 	struct ip_mreq mreq;
-	mreq.imr_multiaddr.s_addr = inet_addr("225.0.0.1");
+	//mreq.imr_multiaddr.s_addr = inet_addr("225.0.0.1");
+	mreq.imr_multiaddr.s_addr = url->addr;
 	mreq.imr_interface.s_addr = htonl(INADDR_ANY);//inet_addr("10.118.1.99");
 
 	if (setsockopt(url->s, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0)

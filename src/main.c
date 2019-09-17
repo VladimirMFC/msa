@@ -26,6 +26,7 @@ void options_parse(int argc, char ** argv)
 		switch (ch)
 		{
 		case 'h':
+		case '?':
 			printf("Usage: %s [OPTIONS] [URL]\n", argv[0]);
 			printf("  -v, --version             print version info and exit\n");
 			printf("  -h, --help                print this help and exit\n");
@@ -36,10 +37,6 @@ void options_parse(int argc, char ** argv)
 			printf("Media Stream Analizer version %s\n", VERSION);
 			break;
 
-		case '?':
-			//printf("Unknown option `-%c'.\n", optopt);
-			break;
-
 		default:
 			//syslog(LOG_ERR, "invalid option -- %c", ch);
 			printf("Try `%s --help' for more information.", argv[0]);
@@ -47,13 +44,22 @@ void options_parse(int argc, char ** argv)
 		}
 	}
 
+	if (argc < 3)
+	{
+		printf("Invalid number of arguments.");
+		exit(1);
+	}
+
 	for (int index = optind; index < argc; index++)
 	{
-		printf("Check this URL: %s\n", argv[index]);
-
-		if (url_parse(argv[index], &url))
-			break;
+		printf("Check this [%d]  URL: %s\n", index, argv[index]);
+		if (url_parse(argv[index], index, &url) == false)
+		{
+			printf("Invalid argument: %s", argv[index]);
+			exit(1);
+		}
 	}
+	
 }
 
 int main(int argc, char **argv)
@@ -61,11 +67,11 @@ int main(int argc, char **argv)
 	//openlog(strrchr(argv[0], '/') != NULL ? strrchr(argv[0], '/') + 1 : argv[0], LOG_CONS | LOG_PERROR, LOG_DAEMON);
 
 	options_parse(argc, argv);
-
+	
 	// Start work
-	url_open(&url);
+//	url_open(&url);
 
-	url_receive(&url);
+//	url_receive(&url);
 
 	//closelog();
 
